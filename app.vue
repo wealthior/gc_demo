@@ -20,6 +20,14 @@ useHead({
 
 <template>
   <div class="min-h-screen bg-[#0a0a0a] text-[#f0f0f0]">
+    
+    <header class="border-b border-border px-6 py-4 flex items-center justify-between">
+      <div>
+        <span class="font-mono text-sm tracking-wide text-accent">GapCut: Skill-Match Demo</span>
+      </div>
+      <span class="text-xs text-muted"> prototype by Roberto Mazzotta</span>
+    </header>
+
     <NuxtPage />
   </div>
 </template>
