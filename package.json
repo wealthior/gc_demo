@@ -1,0 +1,17 @@
+{
+  "name": "demo-skill-match",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@nuxt/ui": "^3",
+    "gsap": "^3",
+    "nuxt": "^3"
+  }
+}
