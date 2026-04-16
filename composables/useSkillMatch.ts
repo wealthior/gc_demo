@@ -2,8 +2,8 @@
 const jobProfiles = {
   frontend: {
     title: 'Frontend Developer',
-    required: ['Vue.js', 'Nuxt', 'TypeScript', 'Tailwind', 'REST API', 'Git', 'Angular'],
-    niceToHave: ['Figma', 'Docker', 'Vitest', 'HTML'],
+    required: ['Vue.js', 'Nuxt', 'TypeScript', 'Tailwind', 'REST API', 'Git',],
+    niceToHave: ['Figma', 'Docker', 'Vitest', 'HTML', 'Angular'],
   },
   fullstack: {
     title: 'Fullstack Developer',
@@ -22,19 +22,18 @@ type ProfileKey = keyof typeof jobProfiles
 // my profile
 const mySkills = [
   'Vue.js', 'Angular', 'TypeScript', 'Tailwind',
-  'REST API', 'Git', 'Figma', 'HTML', 'CSS',
+  'REST API', 'Git', 'Figma', 'HTML', 'CSS', 'Docker', 'Node.js', 'Accessibility'
 ]
 
 function matches(candidate: string, target: string) {
   const a = candidate.toLowerCase().trim()
   const b = target.toLowerCase().trim()
-  
   return a.includes(b) || b.includes(a)
 }
 
 function computeMatch(skills: string[], profileKey: ProfileKey = 'frontend') {
   const profile = jobProfiles[profileKey]
-  if (!profile) return { score: 0, matched: [], missing: [] }
+  if (!profile) return { score: 0, matched: [], missing: [], matchedNice: [] }
 
   const matched = profile.required.filter(req =>
     skills.some(s => matches(s, req))
@@ -43,13 +42,28 @@ function computeMatch(skills: string[], profileKey: ProfileKey = 'frontend') {
     !skills.some(s => matches(s, req))
   )
 
-  // score berechnen
-  const pct = profile.required.length
-    ? Math.round((matched.length / profile.required.length) * 100)
-    : 0
+  const matchedNice = profile.niceToHave.filter(nice =>
+    skills.some(s => matches(s, nice))
+  )
 
-  return { score: pct, matched, missing }
+  // score: required = 80%, nice to have= 20%
+  const reqPct = profile.required.length
+    ? (matched.length / profile.required.length) * 80
+    : 0
+  const nicePct = profile.niceToHave.length
+    ? (matchedNice.length / profile.niceToHave.length) * 20
+    : 0
+  const pct = Math.round(reqPct + nicePct)
+
+  return { score: pct, matched, missing, matchedNice }
 }
 
-export { jobProfiles, mySkills, computeMatch }
+// alle skills eines profils 
+function getAllSkills(profileKey: ProfileKey = 'frontend') {
+  const profile = jobProfiles[profileKey]
+  if (!profile) return []
+  return [...profile.required, ...profile.niceToHave]
+}
+
+export { jobProfiles, mySkills, computeMatch, getAllSkills }
 export type { ProfileKey }
