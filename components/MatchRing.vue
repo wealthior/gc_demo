@@ -8,10 +8,10 @@ const props = defineProps({
 
 const r = 85
 const circ = 2 * Math.PI * r
-const offset = ref(circ) 
+const offset = ref(circ)
 const displayScore = ref(0)
 
-// status label 
+// status label
 const label = computed(() => {
   const s = props.score
   if (s >= 90) return 'Top Match'
@@ -20,6 +20,9 @@ const label = computed(() => {
   return 'wenig Übereinstimmung'
 })
 
+
+const glowActive = computed(() => props.score >= 80)
+
 function animateTo(val) {
   const target = circ - (val / 100) * circ
   gsap.to(offset, {
@@ -27,7 +30,7 @@ function animateTo(val) {
     duration: 0.8,
     ease: 'power2.out',
   })
-  
+
   // score zahl mitzählen lassen
   gsap.to(displayScore, {
     value: val,
@@ -50,7 +53,11 @@ watch(() => props.score, (val) => {
 
 <template>
   <div class="flex flex-col items-center gap-3">
-    <svg width="200" height="200" viewBox="0 0 200 200" class="ring-svg">
+    <svg
+      width="200" height="200" viewBox="0 0 200 200"
+      class="ring-svg"
+      :class="{ glow: glowActive }"
+    >
 
       <!-- hintergrund ring -->
       <circle
@@ -87,6 +94,7 @@ watch(() => props.score, (val) => {
 <style scoped>
 .ring-svg {
   transform: rotate(-90deg);
+  transition: filter 0.5s ease;
 }
 
 .score-text {
@@ -98,4 +106,9 @@ watch(() => props.score, (val) => {
   transform: rotate(90deg);
   transform-origin: 100px 100px;
 }
+
+.ring-svg.glow {
+  filter: drop-shadow(0 0 12px rgba(232, 255, 71, 0.3));
+}
+
 </style>
