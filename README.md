@@ -11,3 +11,10 @@ npm run dev
 ```
 
 -> `http://localhost:3000`.
+
+
+## Tests
+
+```bash
+npm run test
+```

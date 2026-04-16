@@ -59,6 +59,11 @@ const isReqMatched = (skill) => result.value.matched
     <div class="flex justify-center mt-12">
       <MatchRing :score="result.score" />
     </div>
+
+    <!-- footer -->
+    <footer class="text-center mt-16 pb-8">
+      <p class="text-xs text-muted">Built with Nuxt </p>
+    </footer>
   </main>
 </template>
 

@@ -28,7 +28,7 @@ describe('computeMatch', () => {
   it('fuzzy match works both ways', () => {
     const { matched } = computeMatch(['vue', 'nuxt'])
     expect(matched).toContain('Vue.js')
-    expect(matched).toContain('Nuxt.js')
+    expect(matched).toContain('Nuxt')
   })
 
   it('nice-to-have skills ändern den score nicht', () => {

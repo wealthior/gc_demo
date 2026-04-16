@@ -12,7 +12,7 @@ const niceToHaveSkills = [
   'Figma',
   'Docker',
   'Vitest',
-  'Html,'
+  'HTML'
 ]
 
 
