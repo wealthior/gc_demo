@@ -1,5 +1,5 @@
 <script setup>
-import { jobProfiles, mySkills, computeMatch } from '~/composables/useSkillMatch'
+import { jobProfiles, mySkills, computeMatch, getAllSkills } from '~/composables/useSkillMatch'
 
 const profileKey = ref('frontend')
 const profile = computed(() => jobProfiles[profileKey.value])
@@ -21,8 +21,22 @@ watch(skills, (val) => {
 
 const result = computed(() => computeMatch(skills.value, profileKey.value))
 
+// autocomplete vorschläge aus aktuellem profil
+const suggestions = computed(() => getAllSkills(profileKey.value))
+
 const isReqMatched = (skill) => result.value.matched
   .some(m => m.toLowerCase() === skill.toLowerCase())
+
+const isNiceMatched = (skill) => result.value.matchedNice
+  .some(m => m.toLowerCase() === skill.toLowerCase())
+
+// skill hinzufügen wenn noch nicht vorhanden
+function addFromProfile(skill) {
+  if (skills.value.length >= 15) {return}
+  const exists = skills.value.some(s => s.toLowerCase() === skill.toLowerCase())
+  if (exists) {return}
+  skills.value = [...skills.value, skill]
+}
 
 // preset laden
 function loadMyProfile() {
@@ -50,7 +64,7 @@ const profileOptions = [
             Robertos Profil laden
           </button>
         </div>
-        <SkillInput v-model="skills" :matched="result.matched" />
+        <SkillInput v-model="skills" :matched="result.matched" :suggestions="suggestions" />
       </section>
 
       <!-- job profil -->
@@ -70,27 +84,39 @@ const profileOptions = [
         <div class="mb-4">
           <span class="text-xs text-muted block mb-2">Pflichtig</span>
           <div class="flex flex-wrap gap-2">
-            <span
+            <button
               v-for="skill in profile.required"
               :key="skill"
               class="profile-tag"
-              :class="{ matched: isReqMatched(skill) }"
+              :class="{
+                matched: isReqMatched(skill),
+                clickable: !isReqMatched(skill),
+              }"
+              @click="!isReqMatched(skill) && addFromProfile(skill)"
             >
               {{ skill }}
-            </span>
+              <span v-if="!isReqMatched(skill)" class="add-hint">+</span>
+            </button>
           </div>
         </div>
 
         <div>
           <span class="text-xs text-muted block mb-2">Nice to have</span>
           <div class="flex flex-wrap gap-2">
-            <span
+            <button
               v-for="skill in profile.niceToHave"
               :key="skill"
-              class="profile-tag muted"
+              class="profile-tag"
+              :class="{
+                'nice-matched': isNiceMatched(skill),
+                muted: !isNiceMatched(skill),
+                clickable: !isNiceMatched(skill),
+              }"
+              @click="!isNiceMatched(skill) && addFromProfile(skill)"
             >
               {{ skill }}
-            </span>
+              <span v-if="!isNiceMatched(skill)" class="add-hint">+</span>
+            </button>
           </div>
         </div>
       </section>
@@ -105,13 +131,14 @@ const profileOptions = [
     <div v-if="result.missing.length && skills.length > 0" class="mt-8 max-w-md mx-auto">
       <p class="text-xs text-muted font-mono text-center mb-3">Dir fehlt noch</p>
       <div class="flex flex-wrap justify-center gap-2">
-        <span
+        <button
           v-for="skill in result.missing"
           :key="skill"
           class="missing-tag"
+          @click="addFromProfile(skill)"
         >
-          {{ skill }}
-        </span>
+          {{ skill }} <span class="add-hint">+</span>
+        </button>
       </div>
     </div>
 
@@ -124,7 +151,9 @@ const profileOptions = [
 
 <style scoped>
 .profile-tag {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
   padding: 0.25rem 0.75rem;
   font-size: 0.8rem;
   font-family: var(--font-mono);
@@ -134,17 +163,40 @@ const profileOptions = [
   color: #f0f0f0;
   transition: all 0.2s;
 }
+.profile-tag.clickable {
+  cursor: pointer;
+  
+}
+.profile-tag.clickable:hover {
+  border-color: #555;
+}
 .profile-tag.matched {
   border-color: var(--color-accent);
   color: var(--color-accent);
+  cursor: default;
 }
 .profile-tag.muted {
   color: #666;
   border-color: #1e1e1e;
 }
+.profile-tag.nice-matched {
+  border-color: #5a6a2a;
+  color: #a0b840;
+}
+
+.add-hint {
+  font-size: 0.7rem;
+  color: #555;
+  transition: color 0.15s;
+}
+.profile-tag.clickable:hover .add-hint {
+  color: var(--color-accent);
+}
 
 .missing-tag {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
   padding: 0.2rem 0.6rem;
   font-size: 0.75rem;
   font-family: var(--font-mono);
@@ -152,5 +204,11 @@ const profileOptions = [
   border: 1px dashed #444;
   border-radius: 9999px;
   color: #666;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.missing-tag:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
 }
 </style>
