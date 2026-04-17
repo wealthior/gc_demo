@@ -43,6 +43,11 @@ function loadMyProfile() {
   skills.value = [...mySkills]
 }
 
+function resetSkills() {
+  skills.value = []
+  localStorage.removeItem('skills')
+}
+
 const profileOptions = [
   { label: 'Frontend Developer', value: 'frontend' },
   { label: 'Fullstack Developer', value: 'fullstack' },
@@ -57,12 +62,21 @@ const profileOptions = [
       <section class="bg-surface border border-border rounded-md p-6">
         <div class="flex items-center justify-between mb-4">
           <h2 class="font-mono text-sm text-muted uppercase tracking-wider">Deine Skills</h2>
-          <button
-            class="text-xs font-mono text-accent hover:underline transition-colors"
-            @click="loadMyProfile"
-          >
-            Robertos Profil laden
-          </button>
+          <div class="flex gap-3">
+            <button
+              v-if="skills.length"
+              class="text-xs font-mono text-muted hover:text-[#f0f0f0] transition-colors"
+              @click="resetSkills"
+            >
+              Reset
+            </button>
+            <button
+              class="text-xs font-mono text-accent hover:underline transition-colors"
+              @click="loadMyProfile"
+            >
+              Robertos Profil laden
+            </button>
+          </div>
         </div>
         <SkillInput v-model="skills" :matched="result.matched" :suggestions="suggestions" />
       </section>
