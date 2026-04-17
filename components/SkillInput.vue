@@ -7,8 +7,22 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue'])
 
 const input = ref('')
-const max = 15
+const inputRef = ref(null)
+const isMac = typeof navigator !== 'undefined' && /Mac/.test(navigator.userAgent)
+const shortcut = isMac ? '⌘K' : 'Ctrl+K'
+const max = 15 // TODO: evtl. konfigurierbar machen..
 const showSuggestions = ref(false)
+
+// fokussiert das input
+function handleGlobalKey(e) {
+  if ((e.metaKey || e.ctrlKey) && e?.key?.toLowerCase() === 'k') {
+    e.preventDefault()
+    inputRef.value?.$el?.querySelector('input')?.focus()
+  }
+}
+// event lsitener
+onMounted(() => window.addEventListener('keydown', handleGlobalKey))
+onUnmounted(() => window.removeEventListener('keydown', handleGlobalKey))
 
 const isMatched = (skill) => {
   const s = skill.toLowerCase()
@@ -85,11 +99,12 @@ const isFull = computed(() => props.modelValue.length >= max)
   <div>
     <div class="relative">
       <UInput
+        ref="inputRef"
         v-model="input"
-        :placeholder="isFull ? `Max ${max} Skills erreicht` : 'z.B. Vue.js, TypeScript...'"
+        :placeholder="isFull ? `Max ${max} Skills erreicht` : shortcut + ' · Skill eingeben...'"
         :disabled="isFull"
-        size="lg"
-        class="mb-3"
+        size="xl"
+        class="mb-3 w-full"
         autocomplete="off"
         @keydown="onKeydown"
         @input="onInput"
